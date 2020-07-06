@@ -46,3 +46,32 @@ func GenerateUrl(sr *youtube.SearchResult) *url.URL {
 	u.RawQuery = q.Encode()
 	return u
 }
+
+// getLatestVideo 最新の動画を取得
+func getLatestVideo() *youtube.SearchResult {
+	// 環境変数からAPIキーとチャンネルIDを取得
+	apiKey := os.Getenv("API_KEY")
+	channelId := os.Getenv("COCO_CHANNEL_ID")
+
+	// Youtubeサービスの生成
+	youtubeService, err := youtube.NewService(context.Background(), option.WithAPIKey(apiKey))
+	if err != nil {
+		logrus.Fatalf("Error creating new Youtube services: %v", err)
+	}
+
+	// SearchListAPIのパラメータ設定
+	youtubeSearchList := youtubeService.Search.
+		List("snippet").
+		ChannelId(channelId).
+		Type("video").
+		Order("date").
+		MaxResults(1)
+
+	// API実行
+	res, err := youtubeSearchList.Do()
+	if err != nil {
+		logrus.Fatalf("Error calling Youtube API: %v", err)
+	}
+
+	return res.Items[0]
+}

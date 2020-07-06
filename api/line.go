@@ -50,6 +50,56 @@ func isPublishDateOfToday(target string) bool {
 	return !reg.MatchString(target)
 }
 
+// Main メイン
+func Main() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		video := getLatestVideo()
+		if !isAsacoco(video) || !isTodayVideo(video) {
+			if err := sendMessage("今日のあさココはお休みです。"); err != nil {
+				logrus.Fatal(err)
+			}
+		}
+		return c.JSON(fasthttp.StatusOK, video)
+	}
+}
+
+// isAsacoco 朝ココか
+func isAsacoco(video *youtube.SearchResult) bool {
+	reg := regexp.MustCompile(`あさココLIVE`)
+	return reg.MatchString(video.Snippet.Title)
+}
+
+// isTodayVideo 今日の動画か
+func isTodayVideo(video *youtube.SearchResult) bool {
+	time.Local = time.FixedZone("Asia/Tokyo", 9*60*60)
+	layout := "2006-01-02T15:04:05Z"
+	publishTime, _ := time.Parse(layout, video.Snippet.PublishedAt)
+	now := time.Now()
+	yesterday := now.Add(time.Duration(-24) * time.Hour)
+
+	if publishTime.Unix() < now.Unix() && publishTime.Unix() > yesterday.Unix() {
+		// 過去24時間以内に枠が作成されていればtrueを返却
+		return true
+	}
+	return false
+}
+
+// sendMessage メッセージを送信する
+func sendMessage(message string) error {
+	if botErr != nil {
+		logrus.Fatalf("linebot Error %v", botErr)
+	}
+	roomId := os.Getenv("ROOM_ID")
+	if _, err := bot.PushMessage(
+		roomId,
+		linebot.NewTextMessage(message),
+	).Do(); err != nil {
+		logrus.Fatal(err)
+		return err
+	}
+	return nil
+}
+
 func pushTextMessage(video *youtube.SearchResult) error {
 	if botErr != nil {
 		logrus.Fatalf("linebot Error %v", botErr)
