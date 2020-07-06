@@ -55,7 +55,7 @@ func Main() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		video := getLatestVideo()
 		if !isAsacoco(video) || !isTodayVideo(video) {
-			if err := sendMessage("今日のあさココはお休みです。"); err != nil {
+			if err := sendMessage("休んでんで"); err != nil {
 				logrus.Fatal(err)
 			}
 		}
