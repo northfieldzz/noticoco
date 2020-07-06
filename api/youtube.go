@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/api/option"
+	"google.golang.org/api/youtube/v3"
 	"net/url"
 	"os"
 	"path"
