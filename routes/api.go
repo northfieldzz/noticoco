@@ -13,7 +13,7 @@ func Init(e *echo.Echo) {
 	}
 	Line := e.Group("line")
 	{
-		Line.POST("/asacoco/push", api.Main())
+		Line.POST("/asacoco/push", api.Push())
 		Line.POST("/asacoco/callback", api.CallBack())
 	}
 }
