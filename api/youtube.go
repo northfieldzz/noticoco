@@ -18,7 +18,7 @@ func FetchCocoVideos() *youtube.SearchListCall {
 	if err != nil {
 		logrus.Fatalf("Error creating new Youtube services: %v", err)
 	}
-	call := yts.Search.List("snippet")
+	call := yts.Search.List([]string{"snippet"})
 	call = call.ChannelId(kiryuCocoId).Type("video")
 	return call
 }
@@ -62,7 +62,7 @@ func getLatestVideo() *youtube.SearchResult {
 
 	// SearchListAPIのパラメータ設定
 	youtubeSearchList := youtubeService.Search.
-		List("snippet").
+		List([]string{"snippet"}).
 		ChannelId(channelId).
 		Type("video").
 		Order("date").
