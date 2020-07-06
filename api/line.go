@@ -47,7 +47,7 @@ func isPublishDateOfToday(target string) bool {
 	}
 	_, todayMonth, todayDate := time.Now().In(loc).Date()
 	reg := regexp.MustCompile(fmt.Sprintf("%d月%d日", todayMonth, todayDate))
-	return !reg.MatchString(target)
+	return reg.MatchString(target)
 }
 
 // Main メイン
