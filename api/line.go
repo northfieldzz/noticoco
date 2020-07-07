@@ -135,9 +135,9 @@ func pushFlexMessage(video *youtube.SearchResult) error {
 			AspectMode:  linebot.FlexImageAspectModeTypeCover,
 			Action: &linebot.URIAction{
 				Label: "hero01",
-				URI:   GenerateUrl(video).String(),
+				URI:   GenerateURL(video).String(),
 				AltURI: &linebot.URIActionAltURI{
-					Desktop: GenerateUrl(video).String(),
+					Desktop: GenerateURL(video).String(),
 				},
 			},
 		},
