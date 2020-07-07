@@ -10,31 +10,6 @@ import (
 	"path"
 )
 
-// func FetchCocoVideos() *youtube.SearchListCall {
-// 	key := os.Getenv("API_KEY")
-// 	kiryuCocoId := os.Getenv("COCO_CHANNEL_ID")
-// 	ctx := context.Background()
-// 	yts, err := youtube.NewService(ctx, option.WithAPIKey(key))
-// 	if err != nil {
-// 		logrus.Fatalf("Error creating new Youtube services: %v", err)
-// 	}
-// 	call := yts.Search.List([]string{"snippet"})
-// 	call = call.ChannelId(kiryuCocoId).Type("video")
-// 	return call
-// }
-
-// func FetchLatestAsacoco() *youtube.SearchResult {
-// 	call := FetchCocoVideos()
-// 	call = call.Q("あさココ").Q("LIVE")
-// 	call = call.Order("date").MaxResults(5)
-// 	res, err := call.Do()
-// 	if err != nil {
-// 		logrus.Fatalf("Error calling Youtube API: %v", err)
-// 	}
-// 	items := res.Items
-// 	return items[0]
-// }
-
 // FetchLatestVideo 最新の動画情報を1件取得.
 func FetchLatestVideo() *youtube.SearchResult {
 	// 環境変数からAPIキーとチャンネルIDを取得
