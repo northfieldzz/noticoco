@@ -30,7 +30,7 @@ func Push() echo.HandlerFunc {
 		video := FetchLatestVideo()
 		if !IsAsacoco(video) || !IsTodayVideo(video) {
 			// あさココではない or 今日の動画ではない場合はあさココ休み
-			err := PushMessage("休んでんで")
+			err := PushMessage("今日のあさココはお休みです。")
 			if err != nil {
 				logrus.Fatal(err)
 			}
