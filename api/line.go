@@ -24,32 +24,6 @@ func CallBack() echo.HandlerFunc {
 	}
 }
 
-// func Push() echo.HandlerFunc {
-// 	return func(c echo.Context) error {
-// 		video := FetchLatestAsacoco()
-// 		if isPublishDateOfToday(video.Snippet.Title) {
-// 			if err := pushFlexMessage(video); err != nil {
-// 				logrus.Fatal(err)
-// 			}
-// 		} else {
-// 			if err := pushTextMessage(video); err != nil {
-// 				logrus.Fatal(err)
-// 			}
-// 		}
-// 		return c.JSON(fasthttp.StatusOK, video)
-// 	}
-// }
-
-// func isPublishDateOfToday(target string) bool {
-// 	loc, err := time.LoadLocation(location)
-// 	if err != nil {
-// 		loc = time.FixedZone(location, 9*60*60)
-// 	}
-// 	_, todayMonth, todayDate := time.Now().In(loc).Date()
-// 	reg := regexp.MustCompile(fmt.Sprintf("%d月%d日", todayMonth, todayDate))
-// 	return reg.MatchString(target)
-// }
-
 // Push メイン.
 func Push() echo.HandlerFunc {
 	return func(c echo.Context) error {
@@ -60,10 +34,12 @@ func Push() echo.HandlerFunc {
 			if err != nil {
 				logrus.Fatal(err)
 			}
-		}
-		err := pushFlexMessage(video)
-		if err != nil {
-			logrus.Fatal(err)
+		} else {
+			// あさココの場合はFlexメッセージを送信
+			err := pushFlexMessage(video)
+			if err != nil {
+				logrus.Fatal(err)
+			}
 		}
 		return c.JSON(fasthttp.StatusOK, video)
 	}
@@ -104,22 +80,6 @@ func PushMessage(message string) error {
 	}
 	return nil
 }
-
-// func pushTextMessage(video *youtube.SearchResult) error {
-// 	if botErr != nil {
-// 		logrus.Fatalf("linebot Error %v", botErr)
-// 	}
-// 	message := "今日のあさココはお休みです。"
-// 	roomId := os.Getenv("ROOM_ID")
-// 	if _, err := bot.PushMessage(
-// 		roomId,
-// 		linebot.NewTextMessage(message),
-// 	).Do(); err != nil {
-// 		logrus.Fatal(err)
-// 		return err
-// 	}
-// 	return nil
-// }
 
 func pushFlexMessage(video *youtube.SearchResult) error {
 	if botErr != nil {
@@ -173,7 +133,7 @@ func pushFlexMessage(video *youtube.SearchResult) error {
 					Height: linebot.FlexButtonHeightTypeSm,
 					Style:  linebot.FlexButtonStyleTypeLink,
 					Action: &linebot.URIAction{
-						Label: "Coco Ch. 桐生ココ",
+						Label: video.Snippet.ChannelTitle,
 						URI:   "https://www.youtube.com/channel/UCS9uQI-jC3DE0L4IpXyvr6w",
 						AltURI: &linebot.URIActionAltURI{
 							Desktop: "https://www.youtube.com/channel/UCS9uQI-jC3DE0L4IpXyvr6w",
