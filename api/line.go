@@ -24,53 +24,59 @@ func CallBack() echo.HandlerFunc {
 	}
 }
 
+// func Push() echo.HandlerFunc {
+// 	return func(c echo.Context) error {
+// 		video := FetchLatestAsacoco()
+// 		if isPublishDateOfToday(video.Snippet.Title) {
+// 			if err := pushFlexMessage(video); err != nil {
+// 				logrus.Fatal(err)
+// 			}
+// 		} else {
+// 			if err := pushTextMessage(video); err != nil {
+// 				logrus.Fatal(err)
+// 			}
+// 		}
+// 		return c.JSON(fasthttp.StatusOK, video)
+// 	}
+// }
+
+// func isPublishDateOfToday(target string) bool {
+// 	loc, err := time.LoadLocation(location)
+// 	if err != nil {
+// 		loc = time.FixedZone(location, 9*60*60)
+// 	}
+// 	_, todayMonth, todayDate := time.Now().In(loc).Date()
+// 	reg := regexp.MustCompile(fmt.Sprintf("%d月%d日", todayMonth, todayDate))
+// 	return reg.MatchString(target)
+// }
+
+// Push メイン.
 func Push() echo.HandlerFunc {
 	return func(c echo.Context) error {
-		video := FetchLatestAsacoco()
-		if isPublishDateOfToday(video.Snippet.Title) {
-			if err := pushFlexMessage(video); err != nil {
+		video := FetchLatestVideo()
+		if !IsAsacoco(video) || !IsTodayVideo(video) {
+			// あさココではない or 今日の動画ではない場合はあさココ休み
+			err := PushMessage("休んでんで")
+			if err != nil {
 				logrus.Fatal(err)
 			}
-		} else {
-			if err := pushTextMessage(video); err != nil {
-				logrus.Fatal(err)
-			}
+		}
+		err := pushFlexMessage(video)
+		if err != nil {
+			logrus.Fatal(err)
 		}
 		return c.JSON(fasthttp.StatusOK, video)
 	}
 }
 
-func isPublishDateOfToday(target string) bool {
-	loc, err := time.LoadLocation(location)
-	if err != nil {
-		loc = time.FixedZone(location, 9*60*60)
-	}
-	_, todayMonth, todayDate := time.Now().In(loc).Date()
-	reg := regexp.MustCompile(fmt.Sprintf("%d月%d日", todayMonth, todayDate))
-	return reg.MatchString(target)
-}
-
-// Main メイン
-func Main() echo.HandlerFunc {
-	return func(c echo.Context) error {
-		video := getLatestVideo()
-		if !isAsacoco(video) || !isTodayVideo(video) {
-			if err := sendMessage("休んでんで"); err != nil {
-				logrus.Fatal(err)
-			}
-		}
-		return c.JSON(fasthttp.StatusOK, video)
-	}
-}
-
-// isAsacoco 朝ココか
-func isAsacoco(video *youtube.SearchResult) bool {
+// IsAsacoco 朝ココか.
+func IsAsacoco(video *youtube.SearchResult) bool {
 	reg := regexp.MustCompile(`あさココLIVE`)
 	return reg.MatchString(video.Snippet.Title)
 }
 
-// isTodayVideo 今日の動画か
-func isTodayVideo(video *youtube.SearchResult) bool {
+// IsTodayVideo 今日の動画か.
+func IsTodayVideo(video *youtube.SearchResult) bool {
 	time.Local = time.FixedZone("Asia/Tokyo", 9*60*60)
 	layout := "2006-01-02T15:04:05Z"
 	publishTime, _ := time.Parse(layout, video.Snippet.PublishedAt)
@@ -84,14 +90,13 @@ func isTodayVideo(video *youtube.SearchResult) bool {
 	return false
 }
 
-// sendMessage メッセージを送信する
-func sendMessage(message string) error {
+// PushMessage メッセージを送信する.
+func PushMessage(message string) error {
 	if botErr != nil {
 		logrus.Fatalf("linebot Error %v", botErr)
 	}
-	roomId := os.Getenv("ROOM_ID")
 	if _, err := bot.PushMessage(
-		roomId,
+		os.Getenv("ROOM_ID"),
 		linebot.NewTextMessage(message),
 	).Do(); err != nil {
 		logrus.Fatal(err)
@@ -100,21 +105,21 @@ func sendMessage(message string) error {
 	return nil
 }
 
-func pushTextMessage(video *youtube.SearchResult) error {
-	if botErr != nil {
-		logrus.Fatalf("linebot Error %v", botErr)
-	}
-	message := "今日のあさココはお休みです。"
-	roomId := os.Getenv("ROOM_ID")
-	if _, err := bot.PushMessage(
-		roomId,
-		linebot.NewTextMessage(message),
-	).Do(); err != nil {
-		logrus.Fatal(err)
-		return err
-	}
-	return nil
-}
+// func pushTextMessage(video *youtube.SearchResult) error {
+// 	if botErr != nil {
+// 		logrus.Fatalf("linebot Error %v", botErr)
+// 	}
+// 	message := "今日のあさココはお休みです。"
+// 	roomId := os.Getenv("ROOM_ID")
+// 	if _, err := bot.PushMessage(
+// 		roomId,
+// 		linebot.NewTextMessage(message),
+// 	).Do(); err != nil {
+// 		logrus.Fatal(err)
+// 		return err
+// 	}
+// 	return nil
+// }
 
 func pushFlexMessage(video *youtube.SearchResult) error {
 	if botErr != nil {
