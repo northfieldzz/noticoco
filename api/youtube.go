@@ -77,3 +77,17 @@ func GenerateURL(sr *youtube.SearchResult) *url.URL {
 	u.RawQuery = q.Encode()
 	return u
 }
+
+// 配信ステータスを取得
+func BroadcastStatus(v *youtube.SearchResult) string {
+	switch v.Snippet.LiveBroadcastContent {
+		case "live":
+			s := "配信中"
+		case "upcoming"
+			s := "配信予定"
+		case "none":
+		default:
+			s := "配信終了"
+	}
+	return s
+}

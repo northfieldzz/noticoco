@@ -159,7 +159,7 @@ func pushFlexMessage(video *youtube.SearchResult) error {
 						&linebot.TextComponent{
 							Type: linebot.FlexComponentTypeText,
 							Size: linebot.FlexTextSizeTypeSm,
-							Text: video.Snippet.LiveBroadcastContent,
+							Text: BroadcastStatus(video),
 						},
 					},
 				},
@@ -173,7 +173,7 @@ func pushFlexMessage(video *youtube.SearchResult) error {
 					Height: linebot.FlexButtonHeightTypeSm,
 					Style:  linebot.FlexButtonStyleTypeLink,
 					Action: &linebot.URIAction{
-						Label: video.Snippet.ChannelId,
+						Label: "Coco Ch. 桐生ココ",
 						URI:   "https://www.youtube.com/channel/UCS9uQI-jC3DE0L4IpXyvr6w",
 						AltURI: &linebot.URIActionAltURI{
 							Desktop: "https://www.youtube.com/channel/UCS9uQI-jC3DE0L4IpXyvr6w",
