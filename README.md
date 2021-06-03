@@ -1,6 +1,6 @@
 # noticoco
 
-Virtual Youtuber 桐生ココの動向を知らせるLine bot
+Virtual Youtuber 桐生ココが行う朝ココ動向を知らせるLine bot
 
 ## development
 
